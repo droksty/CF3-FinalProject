@@ -9,6 +9,7 @@ A Java Spring / MongoDB / ? Full Stack application developed as the final projec
         Rest Controller  
         Basic CRUD functionality - Insert, Update, Delete, FindOne, FindMany  
         "Advanced" queries - FindMany between two dates  
-  
+0.0.2 - Minor update removing SomeCustomException  
+
 
 

@@ -5,7 +5,6 @@ import gr.aueb.cf.finalproject.model.Reservation;
 import gr.aueb.cf.finalproject.service.IReservationService;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationAlreadyExistsException;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
-import gr.aueb.cf.finalproject.service.exceptions.SomeCustomException;
 import gr.aueb.cf.finalproject.service.exceptions.UnexpectedErrorException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,14 +40,14 @@ public class ReservationController {
         Reservation insertedReservation = service.insertReservation(reservationDTO);
         ReservationDTO insertedReservationDTO = entityToDTO(insertedReservation);
 
-        return  new ResponseEntity<>(insertedReservationDTO, HttpStatus.OK);
+        return new ResponseEntity<>(insertedReservationDTO, HttpStatus.OK);
     }
 
     @PutMapping("/reservations")
     public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO reservationDTO)
             throws UnexpectedErrorException {
 
-        String id = reservationDTO.getId();
+        String id = reservationDTO.getId().trim().toUpperCase();
 
         if (!service.reservationExistsById(id)) throw new UnexpectedErrorException(id);
 
@@ -79,11 +78,13 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationDTO>> getReservationsByGuestName(@RequestParam("guestName") String guestName)
-            throws SomeCustomException {
+    public ResponseEntity<List<ReservationDTO>> getReservationsByGuestName(@RequestParam("guestName") String guestName) {
         List<Reservation> reservations = service.findReservationsByGuestName(guestName);
 
-        if (reservations.size() == 0) throw new SomeCustomException();
+        if (reservations.size() == 0) {
+            // No reservations found matching your search criteria.
+            System.out.println("Implement a user friendly msg like the comment above");
+        }
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
         for (Reservation reservation : reservations) {
@@ -96,12 +97,14 @@ public class ReservationController {
 
     //
     @GetMapping("/reservations/filter/datesBetween")
-    public ResponseEntity<List<ReservationDTO>> getReservationsByDatesBetween(@RequestParam String dateFrom, String dateTo)
-            throws SomeCustomException {
+    public ResponseEntity<List<ReservationDTO>> getReservationsByDatesBetween(@RequestParam String dateFrom, String dateTo) {
 
         List<Reservation> reservations = service.getReservationByCheckinBetween(dateFrom, dateTo);
 
-//        if (reservations.size() == 0) throw new SomeCustomException();
+        /*if (reservations.size() == 0) {
+            // No reservations found matching your search criteria.
+            System.out.println("Implement a user friendly msg like the comment above");
+        }*/
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
         for (Reservation reservation : reservations) {

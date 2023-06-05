@@ -20,10 +20,10 @@ public class Reservation {
     private String checkin;
     private String checkOut;
     private RoomType roomType;
-    private Integer totalPrice;
+    private double totalPrice;
 
 
-    public Reservation(String reference, String reservationDate, String guestName, String checkin, String checkOut, RoomType roomType, Integer totalPrice) {
+    public Reservation(String reference, String reservationDate, String guestName, String checkin, String checkOut, RoomType roomType, double totalPrice) {
         this.reference = reference;
         this.reservationDate = reservationDate;
         this.guestName = guestName;

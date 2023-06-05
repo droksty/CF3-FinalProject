@@ -5,17 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationDTO {
+
     private String id;
+    @NotNull
     private String reference;
     private String reservationDate;
     private String guestName;
     private String checkIn;
     private String checkOut;
     private RoomType roomType;
-    private Integer totalPrice;
+    private double totalPrice;
 }

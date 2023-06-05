@@ -6,37 +6,46 @@ import gr.aueb.cf.finalproject.service.IReservationService;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationAlreadyExistsException;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
 import gr.aueb.cf.finalproject.service.exceptions.UnexpectedErrorException;
+import gr.aueb.cf.finalproject.service.exceptions.ValidationErrorException;
+import gr.aueb.cf.finalproject.validator.ReservationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api")
 public class ReservationController {
-
     private final IReservationService service;
+    private final ReservationValidator validator;
 
     @Autowired
-    public ReservationController(IReservationService reservationService) {
+    public ReservationController(IReservationService reservationService, ReservationValidator reservationValidator) {
         this.service = reservationService;
+        this.validator = reservationValidator;
     }
 
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationDTO> insertReservation(@RequestBody ReservationDTO reservationDTO)
-            throws ReservationAlreadyExistsException {
+    public ResponseEntity<ReservationDTO> insertReservation(@RequestBody ReservationDTO reservationDTO, BindingResult bindingResult)
+            throws ReservationAlreadyExistsException, ValidationErrorException {
 
-        String reference = reservationDTO.getReference().trim().toUpperCase();
-
-        if (service.reservationExists(reference)) {
-            throw new ReservationAlreadyExistsException(reference);
+        validator.validate(reservationDTO, bindingResult);
+        if (bindingResult.hasErrors()) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ValidationErrorException();
         }
 
-        reservationDTO.setReference(reference);
+        if (service.reservationExists(reservationDTO.getReference())) {
+            throw new ReservationAlreadyExistsException(reservationDTO.getReference());
+        }
+
         Reservation insertedReservation = service.insertReservation(reservationDTO);
         ReservationDTO insertedReservationDTO = entityToDTO(insertedReservation);
 
@@ -44,12 +53,18 @@ public class ReservationController {
     }
 
     @PutMapping("/reservations")
-    public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO reservationDTO)
-            throws UnexpectedErrorException {
+    public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO reservationDTO, BindingResult bindingResult)
+            throws UnexpectedErrorException, ValidationErrorException {
 
-        String id = reservationDTO.getId().trim().toUpperCase();
+        validator.validate(reservationDTO, bindingResult);
+        if (bindingResult.hasErrors()) {
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new ValidationErrorException();
+        }
 
-        if (!service.reservationExistsById(id)) throw new UnexpectedErrorException(id);
+        if (!service.reservationExistsById(reservationDTO.getId().trim().toUpperCase())) {
+            throw new UnexpectedErrorException(reservationDTO.getId());
+        }
 
         Reservation updatedReservation = service.updateReservation(reservationDTO);
         ReservationDTO updatedReservationDTO = entityToDTO(updatedReservation);

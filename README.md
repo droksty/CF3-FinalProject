@@ -10,6 +10,6 @@ A Java Spring / MongoDB / ? Full Stack application developed as the final projec
         Basic CRUD functionality - Insert, Update, Delete, FindOne, FindMany  
         "Advanced" queries - FindMany between two dates  
 0.0.2 - Minor update removing SomeCustomException  
-
+0.0.3 - A half step towards Validation Layer implementation
 
 

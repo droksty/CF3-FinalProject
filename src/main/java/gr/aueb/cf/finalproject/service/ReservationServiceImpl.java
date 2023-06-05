@@ -66,7 +66,7 @@ public class ReservationServiceImpl implements IReservationService {
     //
     @Override
     public boolean reservationExists(String reference) {
-        return repository.existsByReference(reference);
+        return repository.existsByReference(reference.trim().toUpperCase());
     }
 
     @Override

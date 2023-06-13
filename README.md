@@ -1,5 +1,5 @@
 # CF3-Final-Project
-A Java Spring / MongoDB / ? Full Stack application developed as the final project for Coding Factory
+A Java Spring / MongoDB Backend developed as the final project for Coding Factory.
 
 ## Update Log  
 0.0.1 - Implement Basic Back End functionality:  

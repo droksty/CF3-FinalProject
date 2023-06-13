@@ -30,7 +30,6 @@ public class ReservationServiceImpl implements IReservationService {
     @Transactional
     @Override
     public Reservation updateReservation(ReservationDTO reservationDTO) {
-
         return repository.save(dtoToEntityWithId(reservationDTO));
     }
 
@@ -43,8 +42,7 @@ public class ReservationServiceImpl implements IReservationService {
     @Override
     public Reservation findReservation(String reference) throws ReservationNotFoundException {
 
-        Reservation reservation = repository.findReservationByReference(reference);
-
+        Reservation reservation = repository.findReservationByReference(reference.trim().toUpperCase());
         if (reservation == null) throw new ReservationNotFoundException(reference);
 
         return reservation;
@@ -52,18 +50,35 @@ public class ReservationServiceImpl implements IReservationService {
 
     @Override
     public List<Reservation> findReservationsByGuestName(String guestName) {
-        return repository.findReservationsByGuestNameLike(guestName);
+        return repository.findReservationsByGuestNameLike(guestName.toLowerCase());
     }
 
 
-    //
+    // Advanced Queries
     @Override
     public List<Reservation> getReservationByCheckinBetween(String dateFrom, String dateTo) {
         return repository.findReservationsByCheckinBetween(dateFrom, dateTo);
     }
 
+    /*@Override
+    public List<Reservation> getReservationsByCheckIn(String checkIn) {
+        return null;
+    }
 
-    //
+    @Override
+    public List<Reservation> getReservationsByCheckOut(String checkOut) {
+        return null;
+    }
+
+    @Override
+    public List<Reservation> getReservationsByRoomType(String roomType) {
+        return null;
+    }*/
+
+
+
+
+    // Util
     @Override
     public boolean reservationExists(String reference) {
         return repository.existsByReference(reference.trim().toUpperCase());
@@ -75,31 +90,12 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
 
-    // TBI
-//    @Override
-//    public List<Reservation> getReservationsByCheckIn(String checkIn) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<Reservation> getReservationsByCheckOut(String checkOut) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<Reservation> getReservationsByRoomType(String roomType) {
-//        return null;
-//    }
-
-
-
-
-    // Util
+    // Mappers
     private Reservation dtoToEntity(ReservationDTO dto) {
         return new Reservation(
                 dto.getReference().trim().toUpperCase(),
                 dto.getReservationDate(),
-                dto.getGuestName(),
+                dto.getGuestName().toLowerCase(),
                 dto.getCheckIn(),
                 dto.getCheckOut(),
                 dto.getRoomType(),
@@ -112,11 +108,12 @@ public class ReservationServiceImpl implements IReservationService {
                 dto.getId(),
                 dto.getReference().trim().toUpperCase(),
                 dto.getReservationDate(),
-                dto.getGuestName(),
+                dto.getGuestName().toLowerCase(),
                 dto.getCheckIn(),
                 dto.getCheckOut(),
                 dto.getRoomType(),
                 dto.getTotalPrice()
         );
     }
+
 }

@@ -1,11 +1,12 @@
 package gr.aueb.cf.finalproject.rest;
 
+import gr.aueb.cf.finalproject.dto.MessageDTO;
 import gr.aueb.cf.finalproject.dto.ReservationDTO;
 import gr.aueb.cf.finalproject.model.Reservation;
 import gr.aueb.cf.finalproject.service.IReservationService;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationAlreadyExistsException;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
-import gr.aueb.cf.finalproject.service.exceptions.UnexpectedErrorException;
+import gr.aueb.cf.finalproject.service.exceptions.IdNotFoundException;
 import gr.aueb.cf.finalproject.service.exceptions.ValidationErrorException;
 import gr.aueb.cf.finalproject.validator.ReservationValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,91 +15,86 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api")
-public class ReservationController {
+public class ReservationRESTController {
     private final IReservationService service;
     private final ReservationValidator validator;
 
     @Autowired
-    public ReservationController(IReservationService reservationService, ReservationValidator reservationValidator) {
+    public ReservationRESTController(IReservationService reservationService, ReservationValidator reservationValidator) {
         this.service = reservationService;
         this.validator = reservationValidator;
     }
 
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationDTO> insertReservation(@RequestBody ReservationDTO reservationDTO, BindingResult bindingResult)
+    public ResponseEntity<ReservationDTO> insertReservation(@RequestBody ReservationDTO dto, BindingResult bindingResult)
             throws ReservationAlreadyExistsException, ValidationErrorException {
 
-        validator.validate(reservationDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            throw new ValidationErrorException();
-        }
+        validator.validate(dto, bindingResult);
+        if (bindingResult.hasErrors()) throw new ValidationErrorException();
 
-        if (service.reservationExists(reservationDTO.getReference())) {
-            throw new ReservationAlreadyExistsException(reservationDTO.getReference());
-        }
+        if (service.reservationExists(dto.getReference())) throw new ReservationAlreadyExistsException(dto.getReference());
 
-        Reservation insertedReservation = service.insertReservation(reservationDTO);
+        Reservation insertedReservation = service.insertReservation(dto);
         ReservationDTO insertedReservationDTO = entityToDTO(insertedReservation);
 
         return new ResponseEntity<>(insertedReservationDTO, HttpStatus.OK);
     }
 
+
     @PutMapping("/reservations")
-    public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO reservationDTO, BindingResult bindingResult)
-            throws UnexpectedErrorException, ValidationErrorException {
+    public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO dto, BindingResult bindingResult)
+            throws IdNotFoundException, ValidationErrorException, ReservationNotFoundException, ReservationAlreadyExistsException {
 
-        validator.validate(reservationDTO, bindingResult);
-        if (bindingResult.hasErrors()) {
-//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            throw new ValidationErrorException();
-        }
+        validator.validate(dto, bindingResult);
+        if (bindingResult.hasErrors()) throw new ValidationErrorException();
 
-        if (!service.reservationExistsById(reservationDTO.getId().trim().toUpperCase())) {
-            throw new UnexpectedErrorException(reservationDTO.getId());
-        }
+        if (!service.reservationExistsById(dto.getId())) throw new IdNotFoundException(dto.getId());
 
-        Reservation updatedReservation = service.updateReservation(reservationDTO);
+        Reservation persistedRes = service.findReservation(dto.getReference());
+        if (!Objects.equals(persistedRes.getId(), dto.getId())) throw new ReservationAlreadyExistsException(dto.getReference());
+
+        Reservation updatedReservation = service.updateReservation(dto);
         ReservationDTO updatedReservationDTO = entityToDTO(updatedReservation);
 
         return new ResponseEntity<>(updatedReservationDTO, HttpStatus.OK);
     }
 
-    @DeleteMapping("/reservations")
-    public ResponseEntity<String> deleteReservation(@RequestParam("id") String id)
-            throws UnexpectedErrorException {
 
-        if (!service.reservationExistsById(id)) throw new UnexpectedErrorException(id);
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<MessageDTO> deleteReservation(@PathVariable("id") String id) throws IdNotFoundException {
+
+        if (!service.reservationExistsById(id)) throw new IdNotFoundException(id);
 
         service.deleteReservation(id);
-        return new ResponseEntity<>("Reservation deleted successfully", HttpStatus.OK);
+        return new ResponseEntity<>(new MessageDTO("Reservation deleted successfully"), HttpStatus.OK);
     }
+
 
     @GetMapping("/reservations/{reference}")
     public ResponseEntity<ReservationDTO> findOneReservation(@PathVariable("reference") String reference)
             throws ReservationNotFoundException {
 
-        Reservation reservation = service.findReservation(reference.trim().toUpperCase());
+        Reservation reservation = service.findReservation(reference);
         ReservationDTO reservationDTO = entityToDTO(reservation);
 
         return new ResponseEntity<>(reservationDTO, HttpStatus.OK);
     }
 
+
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationDTO>> getReservationsByGuestName(@RequestParam("guestName") String guestName) {
-        List<Reservation> reservations = service.findReservationsByGuestName(guestName);
 
+        List<Reservation> reservations = service.findReservationsByGuestName(guestName);
         if (reservations.size() == 0) {
-            // No reservations found matching your search criteria.
-            System.out.println("Implement a user friendly msg like the comment above");
+            System.out.println("No reservations found matching your search criteria");
         }
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
@@ -115,11 +111,9 @@ public class ReservationController {
     public ResponseEntity<List<ReservationDTO>> getReservationsByDatesBetween(@RequestParam String dateFrom, String dateTo) {
 
         List<Reservation> reservations = service.getReservationByCheckinBetween(dateFrom, dateTo);
-
-        /*if (reservations.size() == 0) {
-            // No reservations found matching your search criteria.
-            System.out.println("Implement a user friendly msg like the comment above");
-        }*/
+        if (reservations.size() == 0) {
+            System.out.println("No reservations found matching your search criteria");
+        }
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
         for (Reservation reservation : reservations) {

@@ -47,7 +47,7 @@ public interface IReservationService {
     List<Reservation> findReservationsByGuestName(String guestName);
 
 
-    // Advanced Public API
+    // "Advanced" Queries Public API
     /**
      * Finds every {@link Reservation} between two {@link Reservation#checkin} dates.
      * @param dateFrom   The {@link Reservation#checkin} date as String "yyyy-MM-dd" to start the search from.
@@ -56,12 +56,12 @@ public interface IReservationService {
      */
     List<Reservation> getReservationByCheckinBetween(String dateFrom, String dateTo);
 
+    /*List<Reservation> getReservationsByCheckIn(String checkIn);
+    List<Reservation> getReservationsByCheckOut(String checkOut);
+    List<Reservation> getReservationsByRoomType(String roomType);*/
 
 
+    // Util
     boolean reservationExists(String reference);
     boolean reservationExistsById(String id);
-
-//    List<Reservation> getReservationsByCheckIn(String checkIn);
-//    List<Reservation> getReservationsByCheckOut(String checkOut);
-//    List<Reservation> getReservationsByRoomType(String roomType);
 }

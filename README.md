@@ -13,6 +13,7 @@ A Java Spring / MongoDB Backend developed as the final project for Coding Factor
 0.0.3 - A half step towards Validation Layer implementation  
 0.0.4 - A bit of code cleanup and refactoring:  
         MessageDTO, upd. REST, Exceptions, etc  
+0.0.5 - Update logic fix  
 
 
 

@@ -25,13 +25,13 @@ public class ErrorController {
         return new ResponseEntity<>(new MessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(value = IdNotFoundException.class)
     public ResponseEntity<MessageDTO> handler3(IdNotFoundException e) {
         System.out.println(e.getMessage());
         return new ResponseEntity<>(new MessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(value = ValidationErrorException.class)
     public ResponseEntity<MessageDTO> handler4(ValidationErrorException e) {
         System.out.println(e.getMessage());
         return new ResponseEntity<>(new MessageDTO(e.getMessage()), HttpStatus.BAD_REQUEST);

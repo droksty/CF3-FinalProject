@@ -3,7 +3,6 @@ package gr.aueb.cf.finalproject.service;
 import gr.aueb.cf.finalproject.dto.ReservationDTO;
 import gr.aueb.cf.finalproject.model.Reservation;
 import gr.aueb.cf.finalproject.repository.ReservationRepository;
-import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,12 +39,8 @@ public class ReservationServiceImpl implements IReservationService {
     }
 
     @Override
-    public Reservation findReservation(String reference) throws ReservationNotFoundException {
-
-        Reservation reservation = repository.findReservationByReference(reference.trim().toUpperCase());
-        if (reservation == null) throw new ReservationNotFoundException(reference);
-
-        return reservation;
+    public Reservation findReservation(String reference) {
+        return repository.findReservationByReference(reference.trim().toUpperCase());
     }
 
     @Override

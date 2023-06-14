@@ -51,7 +51,7 @@ public class ReservationRESTController {
 
     @PutMapping("/reservations")
     public ResponseEntity<ReservationDTO> updateReservation(@RequestBody ReservationDTO dto, BindingResult bindingResult)
-            throws IdNotFoundException, ValidationErrorException, ReservationNotFoundException, ReservationAlreadyExistsException {
+            throws IdNotFoundException, ValidationErrorException, ReservationAlreadyExistsException {
 
         validator.validate(dto, bindingResult);
         if (bindingResult.hasErrors()) throw new ValidationErrorException();
@@ -59,7 +59,9 @@ public class ReservationRESTController {
         if (!service.reservationExistsById(dto.getId())) throw new IdNotFoundException(dto.getId());
 
         Reservation persistedRes = service.findReservation(dto.getReference());
-        if (!Objects.equals(persistedRes.getId(), dto.getId())) throw new ReservationAlreadyExistsException(dto.getReference());
+        if (!(persistedRes == null)) {
+            if (!Objects.equals(persistedRes.getId(), dto.getId())) throw new ReservationAlreadyExistsException(dto.getReference());
+        }
 
         Reservation updatedReservation = service.updateReservation(dto);
         ReservationDTO updatedReservationDTO = entityToDTO(updatedReservation);
@@ -83,6 +85,8 @@ public class ReservationRESTController {
             throws ReservationNotFoundException {
 
         Reservation reservation = service.findReservation(reference);
+        if (reservation == null) throw new ReservationNotFoundException(reference);
+
         ReservationDTO reservationDTO = entityToDTO(reservation);
 
         return new ResponseEntity<>(reservationDTO, HttpStatus.OK);

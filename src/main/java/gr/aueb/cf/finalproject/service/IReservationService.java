@@ -2,7 +2,6 @@ package gr.aueb.cf.finalproject.service;
 
 import gr.aueb.cf.finalproject.dto.ReservationDTO;
 import gr.aueb.cf.finalproject.model.Reservation;
-import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
 
 import java.util.List;
 
@@ -32,10 +31,9 @@ public interface IReservationService {
     /**
      * Finds a {@link Reservation} from the database.
      * @param reference The {@link Reservation#reference} to search with.
-     * @return  The {@link Reservation} matching the {@link Reservation#reference} parameter.
-     * @throws ReservationNotFoundException if no {@link Reservation} matching the {@link Reservation#reference} was found.
+     * @return  The {@link Reservation} matching the {@link Reservation#reference} parameter or null if no {@link Reservation} was found.
      */
-    Reservation findReservation(String reference) throws ReservationNotFoundException;
+    Reservation findReservation(String reference);
 
     /**
      * Finds every {@link Reservation} matching the {@link Reservation#guestName} string.

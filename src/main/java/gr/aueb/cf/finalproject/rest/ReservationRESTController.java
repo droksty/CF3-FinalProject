@@ -3,6 +3,7 @@ package gr.aueb.cf.finalproject.rest;
 import gr.aueb.cf.finalproject.dto.MessageDTO;
 import gr.aueb.cf.finalproject.dto.ReservationDTO;
 import gr.aueb.cf.finalproject.model.Reservation;
+import gr.aueb.cf.finalproject.model.RoomType;
 import gr.aueb.cf.finalproject.service.IReservationService;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationAlreadyExistsException;
 import gr.aueb.cf.finalproject.service.exceptions.ReservationNotFoundException;
@@ -97,9 +98,7 @@ public class ReservationRESTController {
     public ResponseEntity<List<ReservationDTO>> getReservationsByGuestName(@RequestParam("guestName") String guestName) {
 
         List<Reservation> reservations = service.findReservationsByGuestName(guestName);
-        if (reservations.size() == 0) {
-            System.out.println("No reservations found matching your search criteria");
-        }
+        //if (reservations.size() == 0) System.out.println("No reservations matching your search criteria were found");
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
         for (Reservation reservation : reservations) {
@@ -110,14 +109,12 @@ public class ReservationRESTController {
     }
 
 
-    //
+    // Advanced Queries - "Filters"
     @GetMapping("/reservations/filter/datesBetween")
     public ResponseEntity<List<ReservationDTO>> getReservationsByDatesBetween(@RequestParam String dateFrom, String dateTo) {
 
         List<Reservation> reservations = service.getReservationByCheckinBetween(dateFrom, dateTo);
-        if (reservations.size() == 0) {
-            System.out.println("No reservations found matching your search criteria");
-        }
+        //if (reservations.size() == 0) System.out.println("No reservations matching your search criteria were found");
 
         List<ReservationDTO> reservationsDTO = new ArrayList<>();
         for (Reservation reservation : reservations) {
@@ -127,6 +124,47 @@ public class ReservationRESTController {
         return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
     }
 
+    @GetMapping("/reservations/filter/checkIn")
+    public ResponseEntity<List<ReservationDTO>> getReservationsByCheckin(@RequestParam String checkIn) {
+
+        List<Reservation> reservations = service.getReservationsByCheckIn(checkIn);
+        //if (reservations.size() == 0) System.out.println("No reservations matching your search criteria were found");
+
+        List<ReservationDTO> reservationsDTO = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            reservationsDTO.add(entityToDTO(reservation));
+        }
+
+        return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/reservations/filter/checkOut")
+    public ResponseEntity<List<ReservationDTO>> getReservationsByCheckOut(@RequestParam String checkOut) {
+
+        List<Reservation> reservations = service.getReservationsByCheckOut(checkOut);
+        //if (reservations.size() == 0) System.out.println("No reservations matching your search criteria were found");
+
+        List<ReservationDTO> reservationsDTO = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            reservationsDTO.add(entityToDTO(reservation));
+        }
+
+        return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/reservations/filter/roomType")
+    public ResponseEntity<List<ReservationDTO>> getReservationsByRoomType(@RequestParam RoomType roomType) {
+
+        List<Reservation> reservations = service.getReservationsByRoomType(roomType);
+        //if (reservations.size() == 0) System.out.println("No reservations matching your search criteria were found");
+
+        List<ReservationDTO> reservationsDTO = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            reservationsDTO.add(entityToDTO(reservation));
+        }
+
+        return new ResponseEntity<>(reservationsDTO, HttpStatus.OK);
+    }
 
     // Util
     private ReservationDTO entityToDTO(Reservation reservation) {
@@ -138,6 +176,6 @@ public class ReservationRESTController {
                 reservation.getCheckin(),
                 reservation.getCheckOut(),
                 reservation.getRoomType(),
-                reservation.getTotalPrice());
+                reservation.getTotalPrice() );
     }
 }

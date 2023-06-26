@@ -21,9 +21,7 @@ public interface ReservationRepository extends MongoRepository<Reservation, Stri
     // Advanced Queries
     @Query("{'checkin' : { '$gte' : ?0, '$lte' : ?1} }")
     List<Reservation> findReservationsByCheckinBetween(String dateFrom, String dateTo);
-
-//    List<Reservation> findReservationsByCheckin(String checkIn);
-//    List<Reservation> findReservationsByCheckOut(String checkOut);
-//    List<Reservation> findReservationsByRoomType(RoomType roomType);
-//    List<Reservation> findReservationsByReservationDate(String reservationDate);
+    List<Reservation> findReservationsByCheckin(String checkIn);
+    List<Reservation> findReservationsByCheckOut(String checkOut);
+    List<Reservation> findReservationsByRoomType(RoomType roomType);
 }

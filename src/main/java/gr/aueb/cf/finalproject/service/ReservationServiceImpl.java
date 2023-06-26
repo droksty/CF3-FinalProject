@@ -2,6 +2,7 @@ package gr.aueb.cf.finalproject.service;
 
 import gr.aueb.cf.finalproject.dto.ReservationDTO;
 import gr.aueb.cf.finalproject.model.Reservation;
+import gr.aueb.cf.finalproject.model.RoomType;
 import gr.aueb.cf.finalproject.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,22 +56,20 @@ public class ReservationServiceImpl implements IReservationService {
         return repository.findReservationsByCheckinBetween(dateFrom, dateTo);
     }
 
-    /*@Override
+    @Override
     public List<Reservation> getReservationsByCheckIn(String checkIn) {
-        return null;
+        return repository.findReservationsByCheckin(checkIn);
     }
 
     @Override
     public List<Reservation> getReservationsByCheckOut(String checkOut) {
-        return null;
+        return repository.findReservationsByCheckOut(checkOut);
     }
 
     @Override
-    public List<Reservation> getReservationsByRoomType(String roomType) {
-        return null;
-    }*/
-
-
+    public List<Reservation> getReservationsByRoomType(RoomType roomType) {
+        return repository.findReservationsByRoomType(roomType);
+    }
 
 
     // Util
